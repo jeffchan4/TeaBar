@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+@layer components {
+    .btn-std {
+        @apply p-1 px-3 cursor-pointer rounded-full items-center hover:bg-opacity-90
+    }
+
+    .border-std {
+        @apply border-2 rounded-md
+    }
+
+}
+
+body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
