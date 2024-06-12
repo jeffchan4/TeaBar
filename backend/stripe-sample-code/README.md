@@ -4,29 +4,16 @@ Stripe Checkout is the fastest way to get started with payments. Included are so
 
 ## Running the sample
 
-1. Build the server
-
-~~~
-pip3 install -r requirements.txt
-~~~
-
-2. Run the server
-
-~~~
-export FLASK_APP=server.py
-python3 -m flask run --port=4242
-~~~
-
-3. Build the client app
+1. Build the application
 
 ~~~
 npm install
 ~~~
 
-4. Run the client app
+2. Run the application
 
 ~~~
 npm start
 ~~~
 
-5. Go to [http://localhost:3000/checkout](http://localhost:3000/checkout)
+3. Go to [http://localhost:3000/checkout](http://localhost:3000/checkout)
