@@ -13,7 +13,7 @@ import {
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
-// This is your test public API key.
+// This is your test secret API key.
 const stripePromise = loadStripe("pk_test_51PQjG6AFqUQd4Eny97EEltNnbulvb17KkCYaYCRrzzLHStHRXHI5KQ1c8L3cRjPVpEWO3r6TVDtK3NamOTBLxlge0046VhD04L");
 
 const CheckoutForm = () => {
@@ -75,7 +75,7 @@ const Return = () => {
     )
   }
 
-  return null;
+  return null; //replace this with our returning home url
 }
 
 const App = () => {
