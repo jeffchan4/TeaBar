@@ -9,7 +9,9 @@ import {
   Route,
   Routes,
   Navigate
+  
 } from "react-router-dom";
+import CompleteCheckout from './CompleteCheckout';
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
@@ -17,8 +19,17 @@ import {
 const stripePromise = loadStripe("pk_test_51PQjG6AFqUQd4Eny97EEltNnbulvb17KkCYaYCRrzzLHStHRXHI5KQ1c8L3cRjPVpEWO3r6TVDtK3NamOTBLxlge0046VhD04L");
 
 const CheckoutForm = () => {
+  const [products,setProducts]=useState([]);
   const fetchClientSecret = useCallback(() => {
     // Create a Checkout Session
+    
+
+    fetch(`/list-all-products`)
+    .then((res)=> res.json())
+    .then((data)=>{
+      console.log(data);
+    });
+    
     return fetch("/create-checkout-session", {
       method: "POST",
     })
@@ -55,23 +66,27 @@ const Return = () => {
         setStatus(data.status);
         setCustomerEmail(data.customer_email);
       });
+
+    
   }, []);
 
   if (status === 'open') {
     return (
+      
       <Navigate to="/checkout" />
     )
   }
 
   if (status === 'complete') {
     return (
-      <section id="success">
-        <p>
-          We appreciate your business! A confirmation email will be sent to {customerEmail}.
+    <Navigate to="/complete_checkout" />  
+      
+      // <p>
+      //   We appreciate your business! A confirmation email will be sent to {customerEmail}.
 
-          If you have any questions, please email <a href="mailto:orders@example.com">orders@example.com</a>.
-        </p>
-      </section>
+      //   If you have any questions, please email <a href="mailto:orders@example.com">orders@example.com</a>.
+      // </p>
+      
     )
   }
 
@@ -79,12 +94,14 @@ const Return = () => {
 }
 
 const App = () => {
+  
   return (
     <div className="App">
       <Router>
         <Routes>
           <Route path="/checkout" element={<CheckoutForm />} />
           <Route path="/return" element={<Return />} />
+          <Route path="/complete_checkout" element={<CompleteCheckout/>} />
         </Routes>
       </Router>
     </div>
