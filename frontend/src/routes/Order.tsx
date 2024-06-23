@@ -2,7 +2,8 @@ import Header from '../components/Header'
 import { itemToLinkDict, menuItems, MenuItem, menuOptionsDict } from "../utils/menu-data"
 import tempTea from "../imgs/temp-tea.png"
 import { Modal } from '../components/Modal'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createNoSubstitutionTemplateLiteral } from 'typescript'
 
 function Order() {
     const handleAddCart = (item: MenuItem) => {
@@ -11,22 +12,25 @@ function Order() {
 
     const [showItemSelectModal, setItemSelectModal] = useState(false);
     const [itemSelectChildren, setItemSelectChildren] = useState(<div></div>)
+    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const itemSelectModal = () => {
         return <>
-            <Modal onClick={() => { }} children={itemSelectChildren} />
+            <Modal onClick={() => { setItemSelectModal(false) }} children={itemSelectChildren} />
         </>
     }
 
     // bring up a model for options for given item
     const handleItemSelect = (item: MenuItem, itemType: string) => {
-        console.log(`selected ${item.item}`)
+        console.log(`selected ${item.item} of type ${itemType}`)
         const optionsDict = menuOptionsDict[itemType] ?? {};
+        console.log(optionsDict)
 
         const optionsElement = () => {
-            return <>
+            return <div className="p-2">
                 {
                     Object.keys(optionsDict).map(option => {
                         const values = optionsDict[option];
+                        console.log(`option ${option} with values ${values}`)
 
                         // append the option to the "receipt" data struct
                         // and gray out the other options
@@ -35,22 +39,44 @@ function Order() {
                         const handleSelectOption = (option: string, val: string) => {
                             console.log(`selected ${val} for ${option} type`);
 
+                            // stupid solution: remove all other conflicting options
+                            // const temp = selectedOptions;
+
+                            // const filtered = temp.filter(d => {
+                            //     console.log(d)
+                            //     console.log(!d.includes(option))
+                            //     console.log(option)
+                            //     return !d.includes(option)
+                            // })
+                            // console.log(temp);
+                            // console.log(filtered);
+                            const newValue = `${option}-${val}`
+                            const newArr = [...selectedOptions, newValue]
+                            // console.log(`updated options to ${newArr}`)
+                            // console.log(selectedOptions);
+                            const asda = [...selectedOptions, newValue]
+                            console.log(asda)
+                            setSelectedOptions(asda)
                         }
 
                         return <div className="flex justify-between">
-                            {
-                                values.map(val => {
-                                    return <button onClick={() => handleSelectOption(option, val)}>
-                                        {val}
-                                    </button>
-                                })
-                            }
+                            <span> {option} </span>
+                            <span className="inline-flex justify-between w-1/2">
+                                {
+                                    values.map(val => {
+                                        return <button onClick={() => handleSelectOption(option, val)}>
+                                            {val}
+                                        </button>
+                                    })
+                                }
+                            </span>
                         </div>
                     })
                 }
-            </>
+            </div>
         }
 
+        console.log(optionsElement());
         setItemSelectChildren(optionsElement());
         setItemSelectModal(true);
 
@@ -86,7 +112,7 @@ function Order() {
             }
 
             {
-                showItemSelectModal && itemSelectModal()
+                showItemSelectModal && <Modal onClick={() => { setItemSelectModal(false) }} children={itemSelectChildren} />
             }
         </>
     )

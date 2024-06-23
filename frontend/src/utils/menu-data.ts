@@ -39,7 +39,7 @@ export type MenuItem = {
 }
 
 export const menuOptionsDict: { [key: string]: { [optionType: string]: string[] } } = {
-    "beverage": {
+    "beverages": {
         "size": ["S", "M", "L"],
         "ice": ["less", "regular", "more"],
         "sugar": ["less", "regular", "more"]
