@@ -32,7 +32,18 @@ export type MenuItem = {
     item: string,
     costInPeso: number,
     url?: string,
-    description?: string
+    description?: string,
+    menuOptions?: {
+        [optionName: string]: string[]
+    }
+}
+
+export const menuOptionsDict: { [key: string]: { [optionType: string]: string[] } } = {
+    "beverage": {
+        "size": ["S", "M", "L"],
+        "ice": ["less", "regular", "more"],
+        "sugar": ["less", "regular", "more"]
+    }
 }
 
 export type MenuGroup = { [groupName: string]: MenuItem[] }
