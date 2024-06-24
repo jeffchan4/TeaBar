@@ -2,8 +2,7 @@ import Header from '../components/Header'
 import { itemToLinkDict, menuItems, MenuItem, menuOptionsDict } from "../utils/menu-data"
 import tempTea from "../imgs/temp-tea.png"
 import { Modal } from '../components/Modal'
-import { useEffect, useState } from 'react'
-import { createNoSubstitutionTemplateLiteral } from 'typescript'
+import { useCallback, useEffect, useState } from 'react'
 
 function Order() {
     const handleAddCart = (item: MenuItem) => {
@@ -13,17 +12,27 @@ function Order() {
     const [showItemSelectModal, setItemSelectModal] = useState(false);
     const [itemSelectChildren, setItemSelectChildren] = useState(<div></div>)
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-    const itemSelectModal = () => {
-        return <>
-            <Modal onClick={() => { setItemSelectModal(false) }} children={itemSelectChildren} />
-        </>
-    }
+    // const itemSelectModal = () => {
+    //     return <>
+    //         <Modal onClick={() => { setItemSelectModal(false) }} children={itemSelectChildren} />
+    //     </>
+    // }
+
+    useEffect(() => {
+        console.log(selectedOptions);
+    }, [selectedOptions])
 
     // bring up a model for options for given item
     const handleItemSelect = (item: MenuItem, itemType: string) => {
         console.log(`selected ${item.item} of type ${itemType}`)
         const optionsDict = menuOptionsDict[itemType] ?? {};
         console.log(optionsDict)
+
+        const addToCart = (item: MenuItem, options: string[]) => {
+            // TODO: keep a "receipt" data struct in local storage?
+            return
+        }
+
 
         const optionsElement = () => {
             return <div className="p-2">
@@ -36,43 +45,41 @@ function Order() {
                         // and gray out the other options
                         // IT'S A MULTI SELECT FUCK
                         // TODO: make a receipt data struct
-                        const handleSelectOption = (option: string, val: string) => {
-                            console.log(`selected ${val} for ${option} type`);
+                        const handleSelectOption = (option: string, val: string, dataToAdd: string) => {
+                            // console.log(`selected ${val} for ${option} type`);
 
-                            // stupid solution: remove all other conflicting options
-                            // const temp = selectedOptions;
-
-                            // const filtered = temp.filter(d => {
-                            //     console.log(d)
-                            //     console.log(!d.includes(option))
-                            //     console.log(option)
-                            //     return !d.includes(option)
-                            // })
-                            // console.log(temp);
-                            // console.log(filtered);
-                            const newValue = `${option}-${val}`
-                            const newArr = [...selectedOptions, newValue]
-                            // console.log(`updated options to ${newArr}`)
-                            // console.log(selectedOptions);
-                            const asda = [...selectedOptions, newValue]
-                            console.log(asda)
-                            setSelectedOptions(asda)
+                            // const newValue = `${option}-${val}`
+                            setSelectedOptions(selectedOptions => {
+                                const temp = selectedOptions.filter(d => !d.includes(option))
+                                return [...temp, dataToAdd]
+                            });
                         }
 
-                        return <div className="flex justify-between">
+                        return <div className="flex justify-between my-2">
                             <span> {option} </span>
                             <span className="inline-flex justify-between w-1/2">
                                 {
                                     values.map(val => {
-                                        return <button onClick={() => handleSelectOption(option, val)}>
-                                            {val}
-                                        </button>
+                                        const dataToAdd = `${option}-${val}`;
+                                        const selected = selectedOptions.includes(dataToAdd);
+                                        console.log(selectedOptions);
+                                        const bgColor = selected ? "bg-green-500" : "bg-gray-400";
+                                        return <>
+                                            <button className={`btn-std ${bgColor}`}
+                                                onClick={() => handleSelectOption(option, val, dataToAdd)}>
+                                                {val}
+                                            </button>
+                                        </>
                                     })
                                 }
                             </span>
                         </div>
                     })
                 }
+                <button className="btn-std bg-yellow-tea"
+                    onClick={() => addToCart(item, selectedOptions)}>
+                    Add to cart
+                </button>
             </div>
         }
 
