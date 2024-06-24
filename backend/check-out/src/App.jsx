@@ -8,8 +8,8 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Navigate
-  
+  Navigate,
+ 
 } from "react-router-dom";
 import CompleteCheckout from './CompleteCheckout';
 
@@ -22,20 +22,35 @@ const CheckoutForm = () => {
   const [products,setProducts]=useState([]);
   const fetchClientSecret = useCallback(() => {
     // Create a Checkout Session
-    
-
-    fetch(`/list-all-products`)
-    .then((res)=> res.json())
-    .then((data)=>{
-      console.log(data);
-    });
-    
     return fetch("/create-checkout-session", {
       method: "POST",
     })
       .then((res) => res.json())
       .then((data) => data.clientSecret);
   }, []);
+
+  useEffect(()=>{
+    // Function to call the Express server
+    const fetchProducts = async ()=> {
+    fetch(`/list-all-products`)
+    .then((res)=> res.json())
+    .then((data)=>{
+      const values= Object.values(data); 
+      const product_and_data={}
+
+      for(let i=0; i<values.length; i++){
+        const current_product=values[i];
+        product_and_data[current_product['name']]=current_product;
+      }
+      console.log(product_and_data)
+      setProducts(product_and_data)
+    });
+  }
+    fetchProducts(); 
+  },[]);
+  // useEffect(()=>{
+  //   console.log(products)
+  // },[products]);
 
   const options = {fetchClientSecret};
 
@@ -66,30 +81,15 @@ const Return = () => {
         setStatus(data.status);
         setCustomerEmail(data.customer_email);
       });
-
-    
   }, []);
 
   if (status === 'open') {
-    return (
-      
-      <Navigate to="/checkout" />
-    )
+    return <Navigate to="/checkout" />;
   }
 
   if (status === 'complete') {
-    return (
-    <Navigate to="/complete_checkout" />  
-      
-      // <p>
-      //   We appreciate your business! A confirmation email will be sent to {customerEmail}.
-
-      //   If you have any questions, please email <a href="mailto:orders@example.com">orders@example.com</a>.
-      // </p>
-      
-    )
+    return <Navigate to="/complete_checkout" />;
   }
-
   return null; //replace this with our returning home url
 }
 
