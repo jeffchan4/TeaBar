@@ -4,6 +4,8 @@ const express = require('express');
 const app = express();
 app.use(express.static('public'));
 
+app.locals.products_and_data={};
+
 const YOUR_DOMAIN = 'http://localhost:3000';
 
 app.post('/create-checkout-session', async (req, res) => {
@@ -12,7 +14,7 @@ app.post('/create-checkout-session', async (req, res) => {
     line_items: [
       {
         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: 'price_1PQyKIAFqUQd4EnyzWXbPNaB',
+        price: "price_1PUL8DAFqUQd4EnyZRaACGde",
         quantity: 1,
       },
     ],
@@ -22,6 +24,54 @@ app.post('/create-checkout-session', async (req, res) => {
 
   res.send({clientSecret: session.client_secret});
 });
+app.get('/list-all-products', async (req,res) => {
+  try{
+    const products = await stripe.products.list({limit:100});
+    const data = products.data;
+    const values= Object.values(data); 
+    
+    for(let i=0; i<values.length; i++){
+      const current_product=values[i];
+      
+      app.locals.products_and_data[current_product['name']]=current_product;
+      
+      
+    }
+    console.log(app.locals.products_and_data)
+
+    res.json(app.locals.products_and_data)
+  }catch (error){
+    console.error('Error fetching products from Stripe:', error);
+    res.status(500).send('Internal Server Error');
+  }
+
+})
+
+// app.post('/get-price-id', (req, res) => {
+//   const order_and_quantity = { 'Cardo': 2, 'Coco Rallado': 5, 'Te Negro Latte': 1 };
+
+//   // Assuming req.body contains the data sent from React frontend
+//   const product_and_data = req.body;
+//   const line_items = [];
+
+//   Object.keys(order_and_quantity).forEach(product_name => {
+//     const quant = order_and_quantity[product_name];
+//     const current_line_item = {};
+
+//     // Assuming product_name exists in product_and_data and has an 'id' field
+//     const product_id = product_and_data[product_name]?.id; // Access id safely
+
+//     if (product_id) {
+//       current_line_item['price'] = product_id; // Assuming 'price' is the correct field name
+//       current_line_item['quantity'] = quant;
+//       line_items.push(current_line_item);
+//     }
+//   });
+
+//   res.json({ message: 'Line items created', line_items: line_items });
+// });
+
+
 
 app.get('/session-status', async (req, res) => {
   const session = await stripe.checkout.sessions.retrieve(req.query.session_id);

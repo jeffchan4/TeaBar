@@ -35,22 +35,38 @@ const CheckoutForm = () => {
     fetch(`/list-all-products`)
     .then((res)=> res.json())
     .then((data)=>{
-      const values= Object.values(data); 
-      const product_and_data={}
-
-      for(let i=0; i<values.length; i++){
-        const current_product=values[i];
-        product_and_data[current_product['name']]=current_product;
-      }
-      console.log(product_and_data)
-      setProducts(product_and_data)
+      
+      console.log(data)
+      setProducts(data)
     });
   }
     fetchProducts(); 
   },[]);
-  // useEffect(()=>{
-  //   console.log(products)
-  // },[products]);
+  
+  //function to get order's ids and quantity
+  // useEffect(() => {
+  //   const fetchLineItems = async () => {
+  //     if (products) {
+  //       try {
+  //         const response = await fetch('http://localhost:4242/get-price-id', {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify(products), // convert hashmap to JSON string
+  //         });
+      
+  //         const data = await response.json();
+  //         console.log(data); // Handle the response data
+  //       } catch (error) {
+  //         console.error('Error:', error);
+  //       }
+      
+  //     }
+  //   };
+  
+  //   fetchLineItems();
+  // }, [products]); // Added products to dependency array
 
   const options = {fetchClientSecret};
 
