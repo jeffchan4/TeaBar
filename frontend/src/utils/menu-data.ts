@@ -35,7 +35,8 @@ export type MenuItem = {
     description?: string,
     menuOptions?: {
         [optionName: string]: string[]
-    }
+    },
+    // itemType: "beverages" | "specials" | "bolobao" | "puffpuff" | "sandwich"
 }
 
 export const menuOptionsDict: { [key: string]: { [optionType: string]: string[] } } = {

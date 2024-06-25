@@ -9,146 +9,95 @@ function Order() {
         console.log(item)
     }
 
-    const [showItemSelectModal, setItemSelectModal] = useState(false);
-    const [itemSelectChildren, setItemSelectChildren] = useState(<div></div>);
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+    const [selectedItemtype, setSelectedItemType] = useState("")
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-    // const itemSelectModal = () => {
-    //     return <>
-    //         <Modal onClick={() => { setItemSelectModal(false) }} children={itemSelectChildren} />
-    //     </>
-    // }
-
-    useEffect(() => {
-        // console.log(selectedOptions);
-
-    }, [selectedOptions])
-
-
-    // generates the elements for options of a given item
-    const makeOptionsElement = (item: MenuItem, itemType: string) => {
-        console.log(`selected ${item.item} of type ${itemType}`)
-        const optionsDict = menuOptionsDict[itemType] ?? {};
-        console.log(optionsDict)
-
-        const addToCart = (item: MenuItem, options: string[]) => {
-            // TODO: keep a "receipt" data struct in local storage?
-            return
-        }
-        return <div className="p-2">
-            {
-                Object.keys(optionsDict).map(option => {
-                    const values = optionsDict[option];
-                    console.log(`option ${option} with values ${values}`)
-
-                    // append the option to the "receipt" data struct
-                    // and gray out the other options
-                    // IT'S A MULTI SELECT FUCK
-                    // TODO: make a receipt data struct
-                    const handleSelectOption = (option: string, val: string, dataToAdd: string) => {
-                        // console.log(`selected ${val} for ${option} type`);
-
-                        // const newValue = `${option}-${val}`
-                        setSelectedOptions(selectedOptions => {
-                            const temp = selectedOptions.filter(d => !d.includes(option))
-                            return [...temp, dataToAdd]
-                        });
-                    }
-
-                    return <div className="flex justify-between my-2">
-                        <span> {option} </span>
-                        <span className="inline-flex justify-between w-1/2">
-                            {
-                                values.map(val => {
-                                    const dataToAdd = `${option}-${val}`;
-                                    const selected = selectedOptions.includes(dataToAdd);
-                                    console.log(selectedOptions);
-                                    const bgColor = selected ? "bg-green-500" : "bg-gray-400";
-                                    return <>
-                                        <button className={`btn-std ${bgColor}`}
-                                            onClick={() => handleSelectOption(option, val, dataToAdd)}>
-                                            {val}
-                                        </button>
-                                    </>
-                                })
-                            }
-                        </span>
-                    </div>
-                })
-            }
-            <button className="btn-std bg-yellow-tea"
-                onClick={() => addToCart(item, selectedOptions)}>
-                Add to cart
-            </button>
-        </div>
-    }
+    const [optionsModalContent, setOptionsModalContent] = useState(<></>)
 
     // bring up a model for options for given item
     const handleItemSelect = (item: MenuItem, itemType: string) => {
-        // console.log(`selected ${item.item} of type ${itemType}`)
-        // const optionsDict = menuOptionsDict[itemType] ?? {};
-        // console.log(optionsDict)
-
-        // const addToCart = (item: MenuItem, options: string[]) => {
-        //     // TODO: keep a "receipt" data struct in local storage?
-        //     return
-        // }
-
-
-        // const optionsElement = () => {
-        //     return <div className="p-2">
-        //         {
-        //             Object.keys(optionsDict).map(option => {
-        //                 const values = optionsDict[option];
-        //                 console.log(`option ${option} with values ${values}`)
-
-        //                 // append the option to the "receipt" data struct
-        //                 // and gray out the other options
-        //                 // IT'S A MULTI SELECT FUCK
-        //                 // TODO: make a receipt data struct
-        //                 const handleSelectOption = (option: string, val: string, dataToAdd: string) => {
-        //                     // console.log(`selected ${val} for ${option} type`);
-
-        //                     // const newValue = `${option}-${val}`
-        //                     setSelectedOptions(selectedOptions => {
-        //                         const temp = selectedOptions.filter(d => !d.includes(option))
-        //                         return [...temp, dataToAdd]
-        //                     });
-        //                 }
-
-        //                 return <div className="flex justify-between my-2">
-        //                     <span> {option} </span>
-        //                     <span className="inline-flex justify-between w-1/2">
-        //                         {
-        //                             values.map(val => {
-        //                                 const dataToAdd = `${option}-${val}`;
-        //                                 const selected = selectedOptions.includes(dataToAdd);
-        //                                 console.log(selectedOptions);
-        //                                 const bgColor = selected ? "bg-green-500" : "bg-gray-400";
-        //                                 return <>
-        //                                     <button className={`btn-std ${bgColor}`}
-        //                                         onClick={() => handleSelectOption(option, val, dataToAdd)}>
-        //                                         {val}
-        //                                     </button>
-        //                                 </>
-        //                             })
-        //                         }
-        //                     </span>
-        //                 </div>
-        //             })
-        //         }
-        //         <button className="btn-std bg-yellow-tea"
-        //             onClick={() => addToCart(item, selectedOptions)}>
-        //             Add to cart
-        //         </button>
-        //     </div>
-        // }
-
-        // console.log(optionsElement());
-        setItemSelectChildren(makeOptionsElement(item, itemType));
-        setItemSelectModal(true);
+        setSelectedItem(item);
+        setSelectedItemType(itemType);
     }
 
+
+    // update the modal content on change of selectedItem
+    useEffect(() => {
+        if (selectedItem === null) {
+            // handleDeselectItem(); // might inf loop
+            return;
+        };
+
+        const makeOptionsModalContent = (item: MenuItem,) => {
+            const itemType = selectedItemtype;
+            console.log(`selected \`${item.item}\` of type \`${itemType}\``)
+            const optionsDict = menuOptionsDict[itemType] ?? {};
+            console.log(`options available: ${JSON.stringify(optionsDict)}`)
+
+            const addToCart = (item: MenuItem, options: string[]) => {
+                // TODO: keep a "receipt" data struct in local storage?
+                return
+            }
+
+            // console.log(`option ${option} with values ${values}`)
+            const makeOptionsElement = () => {
+                return <div className="p-2">
+                    {
+                        Object.keys(optionsDict).map(option => {
+                            const values = optionsDict[option];
+
+                            // append the option to the "receipt" data struct
+                            // and gray out the other options
+                            // IT'S A MULTI SELECT FUCK
+                            // TODO: make a receipt data struct
+                            const handleSelectOption = (option: string, val: string, dataToAdd: string) => {
+                                // console.log(`selected ${val} for ${option} type`);
+
+                                // const newValue = `${option}-${val}`
+                                setSelectedOptions(selectedOptions => {
+                                    const temp = selectedOptions.filter(d => !d.includes(option))
+                                    return [...temp, dataToAdd]
+                                });
+                            }
+
+                            return <div className="flex justify-between my-2">
+                                <span> {option} </span>
+                                <span className="inline-flex justify-between w-1/2">
+                                    {
+                                        values.map(val => {
+                                            const dataToAdd = `${option}-${val}`;
+                                            const selected = selectedOptions.includes(dataToAdd);
+                                            // console.log(selectedOptions);
+                                            const bgColor = selected ? "bg-green-500" : "bg-gray-400";
+                                            return <>
+                                                <button className={`btn-std ${bgColor}`}
+                                                    onClick={() => handleSelectOption(option, val, dataToAdd)}>
+                                                    {val}
+                                                </button>
+                                            </>
+                                        })
+                                    }
+                                </span>
+                            </div>
+                        })
+                    }
+                    <button className="btn-std bg-yellow-tea"
+                        onClick={() => addToCart(item, selectedOptions)}>
+                        Add to cart
+                    </button>
+                </div>
+            }
+            // return optionsElement();
+            setOptionsModalContent(makeOptionsElement())
+        }
+
+        makeOptionsModalContent(selectedItem)
+    }, [selectedItem, selectedOptions, selectedItemtype])
+
+    const handleDeselectItem = () => {
+        setSelectedItem(null);
+        setSelectedOptions([]);
+    }
     return (
         <>
             <Header />
@@ -179,7 +128,10 @@ function Order() {
             }
 
             {
-                showItemSelectModal && <Modal onClick={() => { setItemSelectModal(false) }} children={itemSelectChildren} />
+                selectedItem &&
+                <Modal onClick={() => { handleDeselectItem() }}
+                    children={optionsModalContent}
+                />
             }
         </>
     )
