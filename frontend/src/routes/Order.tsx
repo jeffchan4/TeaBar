@@ -3,23 +3,22 @@ import { itemToLinkDict, menuItems, MenuItem, menuOptionsDict } from "../utils/m
 import tempTea from "../imgs/temp-tea.png"
 import { Modal } from '../components/Modal'
 import { useCallback, useEffect, useState } from 'react'
+import { useLocalStorage } from '../utils/useLocalStorage'
 
 function Order() {
-    const handleAddCart = (item: MenuItem) => {
-        console.log(item)
-    }
-
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [selectedItemtype, setSelectedItemType] = useState("")
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [optionsModalContent, setOptionsModalContent] = useState(<></>)
 
+    const [cart, setCart] = useLocalStorage("cart", [])
     // bring up a model for options for given item
     const handleItemSelect = (item: MenuItem, itemType: string) => {
         setSelectedItem(item);
         setSelectedItemType(itemType);
     }
 
+    useEffect(() => { console.log(cart) }, [cart])
 
     // update the modal content on change of selectedItem
     useEffect(() => {
@@ -34,8 +33,15 @@ function Order() {
             const optionsDict = menuOptionsDict[itemType] ?? {};
             console.log(`options available: ${JSON.stringify(optionsDict)}`)
 
-            const addToCart = (item: MenuItem, options: string[]) => {
-                // TODO: keep a "receipt" data struct in local storage?
+            const addToCart = () => {
+                const finalItem = [
+                    selectedItem,
+                    selectedOptions
+                ];
+                setCart((cart: any) => [...cart, finalItem]);
+
+                // TODO: visual indicator that item has been added to cart
+                handleDeselectItem();
                 return
             }
 
@@ -82,7 +88,7 @@ function Order() {
                         })
                     }
                     <button className="btn-std bg-yellow-tea"
-                        onClick={() => addToCart(item, selectedOptions)}>
+                        onClick={() => addToCart()}>
                         Add to cart
                     </button>
                 </div>
@@ -92,7 +98,7 @@ function Order() {
         }
 
         makeOptionsModalContent(selectedItem)
-    }, [selectedItem, selectedOptions, selectedItemtype])
+    }, [selectedItem, selectedOptions, selectedItemtype, setCart])
 
     const handleDeselectItem = () => {
         setSelectedItem(null);
