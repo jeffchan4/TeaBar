@@ -1,9 +1,13 @@
-import React from 'react'
+import { ReactElement } from "react"
 import logo from "../imgs/logo-small.png"
 import { slide as BurgerMenu } from 'react-burger-menu'
 import "./burger-styles.css"
 
-function Header() {
+function Header({
+    children
+}:{
+    children?: ReactElement
+}) {
     return (
         <header className="m-0 grid">
             <BurgerMenu>
@@ -14,6 +18,7 @@ function Header() {
             <a href="/" className="inline-block justify-self-center m-2">
                 <img src={logo} />
             </a>
+            {children}
         </header>
     )
 }

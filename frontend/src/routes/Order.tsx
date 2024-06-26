@@ -5,14 +5,17 @@ import { Modal } from '../components/Modal'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocalStorage } from '../utils/useLocalStorage'
 import ButtonPlusMinus from '../components/ButtonPlusMinus'
+import { BiShoppingBag } from 'react-icons/bi'
 
 function Order() {
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [selectedItemtype, setSelectedItemType] = useState("")
+    const [selectedItemCopies, setSelectedItemCopies] = useState(1)
+
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [optionsModalContent, setOptionsModalContent] = useState(<></>)
 
-    const [cart, setCart] = useLocalStorage("cart", [])
+    const [cart, setCart] = useLocalStorage("teabar-cart", [])
 
     // bring up a model for options for given item
     const handleItemSelect = (item: MenuItem, itemType: string) => {
@@ -36,12 +39,17 @@ function Order() {
             console.log(`options available: ${JSON.stringify(optionsDict)}`)
 
             const addToCart = () => {
-                const finalItem = [
-                    selectedItem,
-                    selectedOptions,
-                    // copies
-                    // TODO: make this a dictionary
-                ];
+                // const finalItem = [
+                //     selectedItem,
+                //     selectedOptions,
+                //     // copies
+                //     // TODO: make this a dictionary
+                // ];
+                const finalItem = {
+                    item: selectedItem,
+                    options: selectedOptions,
+                    copies: selectedItemCopies
+                }
                 setCart((cart: any) => [...cart, finalItem]);
 
                 // TODO: visual indicator that item has been added to cart
@@ -93,7 +101,7 @@ function Order() {
                     }
                     {/* <div className="w-full text-center mt-2"> */}
                     <div className="text-right space-x-4 mt-4">
-                        <ButtonPlusMinus />
+                        <ButtonPlusMinus parentCount={selectedItemCopies} setParentCount={setSelectedItemCopies}/>
                         <button className="btn-std bg-yellow-tea"
                             onClick={() => addToCart()}>
                             Add to order
@@ -111,6 +119,7 @@ function Order() {
     const handleDeselectItem = () => {
         setSelectedItem(null);
         setSelectedOptions([]);
+        setSelectedItemCopies(1);
     }
     return (
         <>
