@@ -9,7 +9,8 @@ function Header({
     children?: ReactElement
 }) {
     return (
-        <header className="m-0 grid">
+        // <header className="m-0 flex justify-between items-center">
+        <header className="m-0 grid grid-cols-3">
             <BurgerMenu>
                 <a id="home" className="menu-item" href="/">Home</a>
                 <a id="menu" className="menu-item" href="/menu">Menu</a>

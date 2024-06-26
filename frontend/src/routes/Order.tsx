@@ -6,7 +6,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLocalStorage } from '../utils/useLocalStorage'
 import ButtonPlusMinus from '../components/ButtonPlusMinus'
 import { BiShoppingBag } from 'react-icons/bi'
-
+import { Link } from 'react-router-dom'
+import { CartType } from "../utils/extraTypes"
 function Order() {
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
     const [selectedItemtype, setSelectedItemType] = useState("")
@@ -15,15 +16,13 @@ function Order() {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
     const [optionsModalContent, setOptionsModalContent] = useState(<></>)
 
-    const [cart, setCart] = useLocalStorage("teabar-cart", [])
+    const [cart, setCart] = useLocalStorage<CartType>("teabar-cart", [])
 
     // bring up a model for options for given item
     const handleItemSelect = (item: MenuItem, itemType: string) => {
         setSelectedItem(item);
         setSelectedItemType(itemType);
     }
-
-    useEffect(() => { console.log(cart) }, [cart])
 
     // update the modal content on change of selectedItem
     useEffect(() => {
@@ -50,7 +49,7 @@ function Order() {
                     options: selectedOptions,
                     copies: selectedItemCopies
                 }
-                setCart((cart: any) => [...cart, finalItem]);
+                setCart((cart) => [...cart, finalItem]);
 
                 // TODO: visual indicator that item has been added to cart
                 handleDeselectItem();
@@ -123,7 +122,14 @@ function Order() {
     }
     return (
         <>
-            <Header />
+            <Header children={
+                <Link to={"/cart"} className="justify-self-end self-center m-4">
+                    <BiShoppingBag size={50} 
+                        className="border-2 hover:border-black border-transparent rounded-lg p-2
+                        "
+                    />
+                </Link>
+            }/>
             {/* MENU GRID */}
             {
                 Object.values(itemToLinkDict).map(d => {

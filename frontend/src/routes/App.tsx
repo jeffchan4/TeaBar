@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-route
 import Home from '../components/Home';
 import Order from './Order';
 import Menu from './Menu';
+import Cart from './Cart';
 
 function App() {
     return (
@@ -10,6 +11,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/menu/:itemType?" element={<Menu />} />
             <Route path="/order" element={<Order />} />
+            <Route path="/cart" element={<Cart />} />
         </Routes>
     );
 }
