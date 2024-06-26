@@ -2,22 +2,20 @@
 const stripe = require('stripe')('sk_test_51PQjG6AFqUQd4EnyBh5J5pObzHgJMVl0t7KmWc6t2qJ7YZV6HtoKSTSCati7XqgPFRzPKZ6IAaB7hoIi9pJmJghE00VOIipeqr');
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 app.use(express.static('public'));
+app.use(bodyParser.json());
 
 app.locals.products_and_data={};
 
 const YOUR_DOMAIN = 'http://localhost:3000';
 
 app.post('/create-checkout-session', async (req, res) => {
+  const {line_items}=req.body;
+  console.log('backend' + line_items)
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
-    line_items: [
-      {
-        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-        price: "price_1PUL8DAFqUQd4EnyZRaACGde",
-        quantity: 1,
-      },
-    ],
+    line_items: line_items,
     mode: 'payment',
     return_url: `${YOUR_DOMAIN}/return?session_id={CHECKOUT_SESSION_ID}`,
   });
@@ -33,11 +31,10 @@ app.get('/list-all-products', async (req,res) => {
     for(let i=0; i<values.length; i++){
       const current_product=values[i];
       
-      app.locals.products_and_data[current_product['name']]=current_product;
-      
-      
+      app.locals.products_and_data[current_product['name']]=current_product;  
     }
-    console.log(app.locals.products_and_data)
+
+    
 
     res.json(app.locals.products_and_data)
   }catch (error){
@@ -47,29 +44,30 @@ app.get('/list-all-products', async (req,res) => {
 
 })
 
-// app.post('/get-price-id', (req, res) => {
-//   const order_and_quantity = { 'Cardo': 2, 'Coco Rallado': 5, 'Te Negro Latte': 1 };
+//convert order and quantity to line_items using local products_and_data
+app.get('/get-price-id', (req, res) => {
+  const order_and_quantity = { 'Cardo': 2, 'Coco Rallado': 5, 'Te Negro Latte': 1 };
 
-//   // Assuming req.body contains the data sent from React frontend
-//   const product_and_data = req.body;
-//   const line_items = [];
+  // Assuming req.body contains the data sent from React frontend
+  
+  const line_items = [];
 
-//   Object.keys(order_and_quantity).forEach(product_name => {
-//     const quant = order_and_quantity[product_name];
-//     const current_line_item = {};
+  Object.keys(order_and_quantity).forEach(product_name => {
+    const quant = order_and_quantity[product_name];
+    const current_line_item = {};
 
-//     // Assuming product_name exists in product_and_data and has an 'id' field
-//     const product_id = product_and_data[product_name]?.id; // Access id safely
-
-//     if (product_id) {
-//       current_line_item['price'] = product_id; // Assuming 'price' is the correct field name
-//       current_line_item['quantity'] = quant;
-//       line_items.push(current_line_item);
-//     }
-//   });
-
-//   res.json({ message: 'Line items created', line_items: line_items });
-// });
+    // Assuming product_name exists in product_and_data and has an 'id' field
+    const product_id = app.locals.products_and_data[product_name]?.default_price; // Access id safely
+    console.log(product_id)
+    if (product_id) {
+      current_line_item['price'] = product_id; // Assuming 'price' is the correct field name
+      current_line_item['quantity'] = quant;
+      line_items.push(current_line_item);
+    }
+  });
+  // console.log('getpriceid'+line_items)
+  res.json(line_items);
+});
 
 
 
