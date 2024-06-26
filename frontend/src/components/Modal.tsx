@@ -1,5 +1,5 @@
 import { ReactElement } from "react"
-import { CloseButton } from "./CloseButton"
+import { CloseButton } from "./ButtonClose"
 
 function Modal({
     onClick,

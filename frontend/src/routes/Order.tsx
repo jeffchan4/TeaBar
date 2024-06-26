@@ -4,6 +4,7 @@ import tempTea from "../imgs/temp-tea.png"
 import { Modal } from '../components/Modal'
 import { useCallback, useEffect, useState } from 'react'
 import { useLocalStorage } from '../utils/useLocalStorage'
+import ButtonPlusMinus from '../components/ButtonPlusMinus'
 
 function Order() {
     const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -12,6 +13,7 @@ function Order() {
     const [optionsModalContent, setOptionsModalContent] = useState(<></>)
 
     const [cart, setCart] = useLocalStorage("cart", [])
+
     // bring up a model for options for given item
     const handleItemSelect = (item: MenuItem, itemType: string) => {
         setSelectedItem(item);
@@ -36,7 +38,9 @@ function Order() {
             const addToCart = () => {
                 const finalItem = [
                     selectedItem,
-                    selectedOptions
+                    selectedOptions,
+                    // copies
+                    // TODO: make this a dictionary
                 ];
                 setCart((cart: any) => [...cart, finalItem]);
 
@@ -87,10 +91,14 @@ function Order() {
                             </div>
                         })
                     }
-                    <button className="btn-std bg-yellow-tea"
-                        onClick={() => addToCart()}>
-                        Add to cart
-                    </button>
+                    {/* <div className="w-full text-center mt-2"> */}
+                    <div className="text-right space-x-4 mt-4">
+                        <ButtonPlusMinus />
+                        <button className="btn-std bg-yellow-tea"
+                            onClick={() => addToCart()}>
+                            Add to order
+                        </button>
+                    </div>
                 </div>
             }
             // return optionsElement();
@@ -107,6 +115,7 @@ function Order() {
     return (
         <>
             <Header />
+            {/* MENU GRID */}
             {
                 Object.values(itemToLinkDict).map(d => {
                     const itemsInGroup = menuItems[d];
@@ -133,6 +142,7 @@ function Order() {
                 })
             }
 
+            {/* OPTIONS MODAL: gets brought up when people click on a memu item */}
             {
                 selectedItem &&
                 <Modal onClick={() => { handleDeselectItem() }}
