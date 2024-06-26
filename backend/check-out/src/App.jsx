@@ -20,21 +20,15 @@ const stripePromise = loadStripe("pk_test_51PQjG6AFqUQd4Eny97EEltNnbulvb17KkCYaY
 
 const CheckoutForm = () => {
   const [products,setProducts]=useState([]);
-  const fetchClientSecret = useCallback(() => {
-    // Create a Checkout Session
-    return fetch("/create-checkout-session", {
-      method: "POST",
-    })
-      .then((res) => res.json())
-      .then((data) => data.clientSecret);
-  }, []);
+  const [line_items,setLineItems]=useState([]);
+  const [options,setOptions]=useState([]);
 
   useEffect(()=>{
     // Function to call the Express server
     const fetchProducts = async ()=> {
     fetch(`/list-all-products`)
     .then((res)=> res.json())
-    .then((data)=>{
+    .then((data)=>{ 
       
       console.log(data)
       setProducts(data)
@@ -43,32 +37,49 @@ const CheckoutForm = () => {
     fetchProducts(); 
   },[]);
   
-  //function to get order's ids and quantity
-  // useEffect(() => {
-  //   const fetchLineItems = async () => {
-  //     if (products) {
-  //       try {
-  //         const response = await fetch('http://localhost:4242/get-price-id', {
-  //           method: 'POST',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify(products), // convert hashmap to JSON string
-  //         });
-      
-  //         const data = await response.json();
-  //         console.log(data); // Handle the response data
-  //       } catch (error) {
-  //         console.error('Error:', error);
-  //       }
-      
-  //     }
-  //   };
+  // function to get order's ids and quantity
+  useEffect(() => {
+    const fetchLineItems = async () => {
+      fetch(`/get-price-id`)
+      .then((res)=> res.json())
+      .then((data)=>{ 
+        console.log('frontend' + data);
+        setLineItems(data);
+      });
+    }
+    
   
-  //   fetchLineItems();
-  // }, [products]); // Added products to dependency array
+    fetchLineItems();
+  }, [products]); // Added products to dependency array
 
-  const options = {fetchClientSecret};
+  useEffect(() => {
+    const fetchClientSecret = async () => {
+      try {
+        console.log('this is');
+        console.log(line_items);
+        const response = await fetch("/create-checkout-session", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ line_items }),
+        });
+        const data = await response.json();
+        return data.clientSecret;
+      } catch (error) {
+        console.error('Error fetching client secret:', error);
+      }
+    };
+
+    if (line_items.length > 0) { // Ensure line_items is not empty
+      fetchClientSecret().then((clientSecret) => {
+        if (clientSecret) {
+          setOptions({ clientSecret });
+        }
+      });
+    }
+  }, [line_items]); // Run when line_items changes
+  
 
   return (
     <div id="checkout">
